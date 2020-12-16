@@ -32,9 +32,6 @@ TEST(mock_io_test, initialActionIsTakenOnce) {
   tick_during_5sec();
 }
 
-#endif
-#if 1
-
 TEST(mock_io_test, justInitialActionIsTakenWhenInputDoesNotChange) {
   // Input is accepted false initially by the library
   mock_io io;

@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#if 0
+#if 1
 struct subscriber {
   void algo() { is_algo_done = true; }
   bool is_algo_done{false};

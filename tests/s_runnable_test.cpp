@@ -7,7 +7,7 @@ extern void global_runner(void);
 
 using namespace simple;
 
-#if 0
+#if 1
 
 struct runnable_mock : s_runnable {
   MOCK_METHOD(void, run, (), (override));

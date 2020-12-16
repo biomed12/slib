@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 
-#if 0
+#if 1
 
 struct simple_timer_f : ::testing::Test {
   simple_timer_f() : t{} {}

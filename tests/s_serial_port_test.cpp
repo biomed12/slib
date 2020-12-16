@@ -8,7 +8,7 @@
 
 extern void global_tick(int ms);
 
-#if 0
+#if 1
 std::string received_data;
 
 struct interpreter {

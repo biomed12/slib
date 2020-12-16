@@ -6,7 +6,7 @@
 extern void global_tick(int ms);
 extern void global_runner(void);
 
-#if 0
+#if 1
 using namespace simple;
 
 std::string request;

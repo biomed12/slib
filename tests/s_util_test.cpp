@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#if 0
+#if 1
 TEST(s_util_test, sizeOfAnyContainerIsCorrect) {
   struct type {};
 
