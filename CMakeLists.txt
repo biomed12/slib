@@ -17,7 +17,6 @@ include_directories(gtest_gmock)
 
 add_executable(endonezya-kaplan-development
   main.cpp
-  app.cpp
   slib/s_port_connector.hpp
   slib/s_serial_port.hpp
   slib/s_timer.hpp
@@ -38,5 +37,6 @@ add_executable(endonezya-kaplan-development
   tests/s_util_test.cpp
   tests/s_service_test.cpp
   tests/s_runnable_test.cpp
+  utils/xcore_la_154_protocol.hpp
 )
 target_link_libraries(endonezya-kaplan-development Qt${QT_VERSION_MAJOR}::Core)

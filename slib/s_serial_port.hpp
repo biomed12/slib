@@ -8,12 +8,13 @@
 #include "s_timer.hpp"
 
 namespace simple {
-template <typename port_transmitter>
+template <typename transmitter_policy>
 struct serial_port {
-  serial_port(unsigned int rx_timeout = 50)
+  serial_port(transmitter_policy transmitter_, unsigned int rx_timeout = 50)
       : timer{rx_timeout},
         rx_buffer{},
-        rx_counter{} {
+        rx_counter{},
+        transmitter{transmitter_} {
 
         };
 
@@ -59,7 +60,7 @@ struct serial_port {
   simple::timer timer;
   std::array<char, 1024> rx_buffer;
   std::size_t rx_counter;
-  port_transmitter transmitter;
+  transmitter_policy transmitter;
 };
 }  // namespace simple
 

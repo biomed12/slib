@@ -9,7 +9,7 @@ extern void global_tick(int ms);
 using namespace simple;
 
 struct mock_io : s_io {
-  mock_io(int th = 100) : s_io{th} {}
+  mock_io(int th = 100) : s_io{th} { start(); }
   MOCK_METHOD(bool, read, (), (override));
   MOCK_METHOD(void, raising_edge_handler, (), (override));
   MOCK_METHOD(void, falling_edge_handler, (), (override));
@@ -83,4 +83,16 @@ TEST(mock_io_test, fallingEdgeDetectedAfterRisingEdge) {
   EXPECT_CALL(io, falling_edge_handler()).Times(1);
   tick_during_5sec();
 }
+
+TEST(mock_io_test, ioIsStoppable) {
+  mock_io io;
+  io.stop();
+
+  EXPECT_CALL(io, falling_edge_handler()).Times(0);
+  EXPECT_CALL(io, raising_edge_handler()).Times(0);
+  EXPECT_CALL(io, read()).Times(0);
+
+  tick_during_5sec();
+}
+
 #endif

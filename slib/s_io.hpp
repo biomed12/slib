@@ -66,7 +66,12 @@ struct s_io : s_tickable {
   virtual void raising_edge_handler(void) {}
   virtual void falling_edge_handler(void) {}
   virtual bool read(void) = 0;
-  virtual void tick(int ms) override { state->tick_handler(ms, this); }
+  virtual void tick(int ms) override {
+    if (is_stopped) return;
+    state->tick_handler(ms, this);
+  }
+  void stop(void) { is_stopped = true; }
+  void start(void) { is_stopped = false; }
 
  private:
   void take_action() {
@@ -84,6 +89,7 @@ struct s_io : s_tickable {
   io_state* state{nullptr};
   io_initial_state initial_state;
   io_running_state running_state;
+  bool is_stopped{false};
 };
 }  // namespace simple
 

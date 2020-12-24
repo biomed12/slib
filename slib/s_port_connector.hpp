@@ -6,12 +6,15 @@
 #include "s_runnable.hpp"
 
 namespace simple {
-template <typename requester_port, std::size_t post_request_blocking_time,
-          typename responder_port, std::size_t post_response_blocking_time,
-          typename blocker>
+template <typename requester_port, typename responder_port,
+          typename blocking_policy>
 struct port_connector : s_runnable {
-  port_connector(requester_port &requester_, responder_port &responder_)
-      : s_runnable{}, requester{requester_}, responder{responder_} {}
+  port_connector(requester_port &requester_, responder_port &responder_,
+                 blocking_policy blocker_)
+      : s_runnable{},
+        requester{requester_},
+        responder{responder_},
+        blocker{blocker_} {}
 
   ~port_connector() {}
 
@@ -20,6 +23,7 @@ struct port_connector : s_runnable {
  private:
   requester_port &requester;
   responder_port &responder;
+  blocking_policy blocker;
 
  private:
   void connect(void) {
@@ -27,11 +31,16 @@ struct port_connector : s_runnable {
       std::size_t available;
       auto msg = requester.read(available);
       responder.write(msg, available);
-      blocker{}(post_request_blocking_time);
+      // most of the commands are responded in this interval
+      blocker(500);
+      if (responder.available_bytes() == 0) {
+        // wait more for taking long response time
+        blocker(2000);
+      }
       if (responder.available_bytes()) {
         msg = responder.read(available);
         requester.write(msg, available);
-        blocker{}(post_response_blocking_time);
+        blocker(250);
       }
     }
   }

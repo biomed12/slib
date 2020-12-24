@@ -35,18 +35,30 @@ struct responder_transmitter {
 };
 
 struct blocker {
-  void operator()(int ms) && {}
-};
+  void operator()(int ms) {}
+} blocker_insance;
 
-serial_port<requester_transmitter> requester;
-serial_port<responder_transmitter> responder;
+serial_port requester{[](char* data, int size) {
+  // requester port'a response'un gonderilmesi beklenir
+  response.clear();
+  for (int i = 0; i < size; i++) {
+    response.push_back(*(data + i));
+  }
+}};
+
+serial_port responder{[](char* data, int size) {
+  // responder port'a request'in gonderilmesi beklenir
+  request.clear();
+  for (int i = 0; i < size; i++) {
+    request.push_back(*(data + i));
+  }
+}};
 
 struct s_port_connector_test : ::testing::Test {
-  s_port_connector_test() : connector{requester, responder} {}
+  s_port_connector_test() : connector{requester, responder, blocker_insance} {}
 
  protected:
-  port_connector<decltype(requester), 1000, decltype(responder), 250, blocker>
-      connector;
+  port_connector<decltype(requester), decltype(responder), blocker> connector;
 };
 
 auto push_message_and_make_timeout = [](auto& port, std::string msg) {

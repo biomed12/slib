@@ -22,7 +22,8 @@ struct interpreter {
 
 struct serial_port_test : ::testing::Test {
  protected:
-  simple::serial_port<interpreter> port;
+  interpreter iptr;
+  simple::serial_port<interpreter> port{iptr};
 };
 
 TEST_F(serial_port_test, interpreterWorksCorrect) {
@@ -67,9 +68,11 @@ TEST(non_fixture_serial_port_test, snifferSniffs) {
       (void)size;
     }
   };
+  static sniffer_transmitter trs;
 
   static std::string sniffing_data{};
   struct sniffible_port : simple::serial_port<sniffer_transmitter> {
+    sniffible_port() : simple::serial_port<sniffer_transmitter>{trs} {}
     void reading_sniffer(char* data, int size) {
       char* buffer = new char[size + 1]{};
       std::copy(data, data, buffer);
