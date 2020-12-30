@@ -13,7 +13,7 @@ struct timer : s_tickable {
   auto get_value() const noexcept { return counter; }
   auto get_interval(void) const noexcept { return interval; }
   auto set_interval(std::size_t interval_) noexcept { interval = interval_; };
-  auto is_timeout(void) const noexcept { return (counter == interval); }
+  auto is_timeout(void) const noexcept { return (counter >= interval); }
   auto reset(void) noexcept { counter = 0; }
   void tick(int ms) override {
     if (counter < interval) {

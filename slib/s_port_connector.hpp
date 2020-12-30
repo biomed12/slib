@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include "s_runnable.hpp"
+#include "utils/debugger.h"
 
 namespace simple {
 template <typename requester_port, typename responder_port,
@@ -26,21 +27,22 @@ struct port_connector : s_runnable {
   blocking_policy blocker;
 
  private:
-  void connect(void) {
+  void connect(bool clear_flag = true) {
     if (requester.available_bytes() > 0) {
+      debugger("%d byte istek gonderildi...\r", requester.available_bytes());
       std::size_t available;
       auto msg = requester.read(available);
       responder.write(msg, available);
+      if (clear_flag) requester.clear();
       // most of the commands are responded in this interval
-      blocker(500);
-      if (responder.available_bytes() == 0) {
-        // wait more for taking long response time
-        blocker(2000);
-      }
+      debugger("cevap bekleniyor...\r");
+    } else {
+      /*Istek yapilmadan cevap mevcutsa, ilk acilis vs. direkt gonder...*/
       if (responder.available_bytes()) {
-        msg = responder.read(available);
+        std::size_t available{0};
+        auto msg = responder.read(available);
         requester.write(msg, available);
-        blocker(250);
+        responder.clear();
       }
     }
   }

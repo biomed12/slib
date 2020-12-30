@@ -16,6 +16,6 @@ s_tickable::s_tickable() {
 s_tickable ::~s_tickable() { tick_service->unsubscribe(this); }
 }  // namespace simple
 
-extern void global_tick(int ms) {
+void global_tick(int ms) {
   simple::tick_service->serv([&ms](auto&& e) { e->tick(ms); });
 }

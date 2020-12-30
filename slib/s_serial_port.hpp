@@ -26,7 +26,14 @@ struct serial_port {
 
   virtual void reading_sniffer(char *data, int size) {}
 
-  std::size_t available_bytes(void) const noexcept { return rx_counter; }
+  std::size_t available_bytes(void) const noexcept {
+    if (timer.is_timeout() == false) {
+      return 0;
+    }
+
+    return rx_counter;
+  }
+
   char *read(std::size_t &available) noexcept {
     char *ref{nullptr};
     available = 0;
@@ -35,10 +42,12 @@ struct serial_port {
       return ref;
     }
 
-    if (rx_counter != 0) {
-      available = rx_counter;
-      ref = rx_buffer.data();
+    if (rx_counter == 0) {
+      return ref;
     }
+
+    available = rx_counter;
+    ref = rx_buffer.data();
 
     reading_sniffer(ref, available);
     return ref;
@@ -46,7 +55,8 @@ struct serial_port {
 
   void clear(void) noexcept { rx_counter = 0; }
 
-  void push_from_ll(char &data) noexcept {
+  template <typename T>
+  void push_from_ll(T &&data) noexcept {
     if (rx_counter < rx_buffer.size()) {
       rx_buffer[rx_counter] = data;
       rx_counter++;
@@ -58,7 +68,7 @@ struct serial_port {
 
  protected:
   simple::timer timer;
-  std::array<char, 1024> rx_buffer;
+  std::array<char, 64> rx_buffer;
   std::size_t rx_counter;
   transmitter_policy transmitter;
 };

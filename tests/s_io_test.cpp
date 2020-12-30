@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 extern void global_tick(int ms);
+extern void global_runner(void);
 
 #if 1
 using namespace simple;
@@ -15,9 +16,10 @@ struct mock_io : s_io {
   MOCK_METHOD(void, falling_edge_handler, (), (override));
 };
 
-void tick_during_5sec(void) {
+void tick_and_run_during_5secs(void) {
   for (int i = 0; i < 50; i++) {
     global_tick(10);
+    global_runner();
   }
 }
 
@@ -29,7 +31,7 @@ TEST(mock_io_test, initialActionIsTakenOnce) {
       .Times(::testing::AtLeast(1))
       .WillRepeatedly(::testing::Return(false));
 
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 }
 
 TEST(mock_io_test, justInitialActionIsTakenWhenInputDoesNotChange) {
@@ -41,7 +43,7 @@ TEST(mock_io_test, justInitialActionIsTakenWhenInputDoesNotChange) {
 
   EXPECT_CALL(io, raising_edge_handler()).Times(0);
   EXPECT_CALL(io, falling_edge_handler()).Times(1);
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 }
 
 TEST(mock_io_test, initialActionIsTakenEvenIfInitialVoltageIsHigh) {
@@ -52,7 +54,7 @@ TEST(mock_io_test, initialActionIsTakenEvenIfInitialVoltageIsHigh) {
 
   EXPECT_CALL(io, raising_edge_handler()).Times(1);
   EXPECT_CALL(io, falling_edge_handler()).Times(0);
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 }
 
 TEST(mock_io_test, raisingEdgeIsDetected) {
@@ -60,13 +62,13 @@ TEST(mock_io_test, raisingEdgeIsDetected) {
 
   EXPECT_CALL(io, read()).Times(::testing::AtLeast(1));
 
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 
   EXPECT_CALL(io, read())
       .Times(::testing::AtLeast(1))
       .WillRepeatedly(::testing::Return(true));
   EXPECT_CALL(io, raising_edge_handler()).Times(1);
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 }
 
 TEST(mock_io_test, fallingEdgeDetectedAfterRisingEdge) {
@@ -75,13 +77,13 @@ TEST(mock_io_test, fallingEdgeDetectedAfterRisingEdge) {
   EXPECT_CALL(io, read())
       .Times(::testing::AtLeast(1))
       .WillRepeatedly(::testing::Return(true));
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 
   EXPECT_CALL(io, read())
       .Times(::testing::AtLeast(1))
       .WillRepeatedly(::testing::Return(false));
   EXPECT_CALL(io, falling_edge_handler()).Times(1);
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 }
 
 TEST(mock_io_test, ioIsStoppable) {
@@ -92,7 +94,7 @@ TEST(mock_io_test, ioIsStoppable) {
   EXPECT_CALL(io, raising_edge_handler()).Times(0);
   EXPECT_CALL(io, read()).Times(0);
 
-  tick_during_5sec();
+  tick_and_run_during_5secs();
 }
 
 #endif

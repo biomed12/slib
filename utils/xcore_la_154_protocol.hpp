@@ -20,28 +20,28 @@ namespace xcore_la_154_protocol
 
 		template <typename T2, unsigned int N2>
 		constexpr auto array_factory(const T2(&arr)[N2]) {
-			auto a = std::array <unsigned char, N2>{};
+			auto a = std::array <char, N2>{};
 			for (unsigned int i = 0; i < N2; i++) {
-				a[i] = static_cast<unsigned char>(arr[i]);
+				a[i] = static_cast<char>(arr[i]);
 			}
 			return a;
 		}
 
-		std::array<unsigned char, N> tx;
-		std::array<unsigned char, NN> rx;
+		std::array<char, N> tx;
+		std::array<char, NN> rx;
 	};
 
 	template <typename T2, unsigned int N2>
 	constexpr auto array_factory(const T2(&arr)[N2]) {
-		auto a = std::array <unsigned char, N2>{};
+		auto a = std::array <char, N2>{};
 		for (unsigned int i = 0; i < N2; i++) {
-			a[i] = static_cast<unsigned char>(arr[i]);
+			a[i] = static_cast<char>(arr[i]);
 		}
 		return a;
 	}
 
-    unsigned char checksum(unsigned char* buffer, int size){
-        unsigned char chk = 0;
+    char checksum(char* buffer, int size){
+        char chk = 0;
         for(int i = 0; i < size; i++){
             chk += *(buffer + i);
         }
@@ -106,8 +106,8 @@ namespace xcore_la_154_protocol
     											{0x55, 0x05, 0x00, 0x2D, 0x33, 0x01, 0xBB, 0xEB, 0xAA}};
 
     auto update_br_setter(int set_value){
-        unsigned char low = (set_value & 0xFF);
-        unsigned char high = (set_value >> 8) & 0xFF;
+        char low = (set_value & 0xFF);
+        char high = (set_value >> 8) & 0xFF;
         br_setter.tx[5] = low;
         br_setter.tx[6] = high;
         br_setter.tx[7] = checksum(br_setter.tx.data(), 7);

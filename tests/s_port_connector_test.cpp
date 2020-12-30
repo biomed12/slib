@@ -2,6 +2,15 @@
 
 #include "gtest/gtest.h"
 #include "slib/s_serial_port.hpp"
+#include "utils/debugger.h"
+
+#ifdef DEBUGGER
+template <typename... Args>
+void debugger(Args... args) {}
+#endif
+
+template <typename... Args>
+void debugger(Args... args) {}
 
 extern void global_tick(int ms);
 extern void global_runner(void);
@@ -65,11 +74,12 @@ auto push_message_and_make_timeout = [](auto& port, std::string msg) {
   for (auto& e : msg) {
     port.push_from_ll(e);
   }
-  global_tick(50);
+  global_tick(100);
 };
 
 TEST_F(s_port_connector_test, dataFromRequesterSideIsAvailableAtResponder) {
   push_message_and_make_timeout(requester, "request message");
+  global_runner();
   global_runner();
   ASSERT_EQ(request, std::string{"request message"});
 }
@@ -77,6 +87,7 @@ TEST_F(s_port_connector_test, dataFromRequesterSideIsAvailableAtResponder) {
 TEST_F(s_port_connector_test, dataFromResponderSideIsAvailableAtRequester) {
   push_message_and_make_timeout(requester, "request message");
   push_message_and_make_timeout(responder, "response message");
+  global_runner();
   global_runner();
   ASSERT_EQ(response, std::string{"response message"});
 }
